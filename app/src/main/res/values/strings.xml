@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">secondapp</string>
+    <string name="add">Добавить пользователя</string>
+</resources>
