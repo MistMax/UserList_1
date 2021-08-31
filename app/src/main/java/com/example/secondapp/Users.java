@@ -8,7 +8,14 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.secondapp.database.UserBaseHelper;
 import com.example.secondapp.database.UserDbSchema;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Users {
     private ArrayList<User> userList;
@@ -21,12 +28,43 @@ public class Users {
     }
 
     public void addUser(User user){
-        ContentValues values = getContentValues(user);
-        database.insert(UserDbSchema.UserTable.NAME, null, values);
+        /*String host = "http://0988.vozhzhaev.ru/handlerAddUser.php";
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(host);
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                    InputStream is = urlConnection.getInputStream();
+                    InputStreamReader reader = new InputStreamReader(is);
+                    int i;
+                    StringBuilder result = new StringBuilder();
+                    while ((i=reader.read()) != -1){
+                        result.append((char)i);
+                    }
+                    System.out.println(result);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread t = new Thread(runnable);
+        t.start();*/
+       ContentValues values = getContentValues(user);
+       database.insert(UserDbSchema.UserTable.NAME, null, values);
     }
 
-    // Метода updateUser(User user) реализуем изменение данных
-    //метод deleteUser(UUID uuid) отправляем запрос на удаление пользователя по его UUID
+    public void updateUser(User user){
+        // Метода updateUser(User user) реализуем изменение данных
+        ContentValues values = getContentValues(user);
+        String stringUuid = user.getUuid().toString();
+        database.update(UserDbSchema.UserTable.NAME, values, UserDbSchema.Cols.UUID+"=?", new String[]{stringUuid});
+    }
+    public void deleteUser(UUID uuid) {
+        //метод deleteUser(UUID uuid) отправляем запрос на удаление пользователя по его UUID
+        String stringUuid = uuid.toString();
+        database.delete(UserDbSchema.UserTable.NAME, UserDbSchema.Cols.UUID+"=?", new String[]{stringUuid});
+    }
 
     private static ContentValues getContentValues(User user) {
         ContentValues values = new ContentValues();

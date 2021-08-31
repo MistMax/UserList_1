@@ -12,23 +12,37 @@ public class FormUserActivity extends AppCompatActivity {
     EditText editTextLastName;
     EditText editTextPhone;
     Button insertUserBtn;
+    User user;
+    boolean addUser = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form_user);
+        user = (User) getIntent().getSerializableExtra("user");
         editTextName = findViewById(R.id.editTextName);
         editTextLastName = findViewById(R.id.editTextLastName);
         editTextPhone = findViewById(R.id.editTextPhone);
         insertUserBtn = findViewById(R.id.insertUserBtn);
+        if (user != null) {
+            editTextName.setText(user.getUserName());
+            editTextLastName.setText(user.getUserLastName());
+            editTextPhone.setText(user.getPhone());
+            addUser = false;
+        }else {
+            user = new User();
+        }
+
+
         insertUserBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                User user = new User();
+
                 user.setUserName(editTextName.getText().toString());
                 user.setUserLastName(editTextLastName.getText().toString());
                 user.setPhone(editTextPhone.getText().toString());
                 Users users = new Users(FormUserActivity.this);
-                users.addUser(user);
+                if (addUser) users.addUser(user);
+                else users.updateUser(user);
                 onBackPressed();
             }
         });

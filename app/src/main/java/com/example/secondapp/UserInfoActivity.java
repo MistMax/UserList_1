@@ -2,6 +2,7 @@ package com.example.secondapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +27,9 @@ public class UserInfoActivity extends AppCompatActivity {
         editUserBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(UserInfoActivity.this, FormUserActivity.class);
+                intent.putExtra("user", user);
+                startActivity(intent);
                 // доп активность для редактирования
                 // нужно передать данные пользователя (сериализация)
                 // реализуем возможность изменить пользователя
@@ -34,8 +38,9 @@ public class UserInfoActivity extends AppCompatActivity {
         deleteUserBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Реализовываем удаление
-                // Возврат на главный экран
+                Users users = new Users(UserInfoActivity.this);
+                users.deleteUser(user.getUuid());
+                onBackPressed();
             }
         });
     }
