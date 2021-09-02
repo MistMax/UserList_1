@@ -28,7 +28,7 @@ public class Users {
     }
 
     public void addUser(User user){
-        /*String host = "http://0988.vozhzhaev.ru/handlerAddUser.php";
+        /*String host = "http://0988.vozhzhaev.ru/handlerAddUser.php?name="+user.getUserName()+"&lastname="+user.getUserLastName()+"&phone="+user.getPhone()+"&uuid="+user.getUuid().toString();
         Runnable runnable = new Runnable() {
             @Override
             public void run() {

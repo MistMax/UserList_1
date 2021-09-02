@@ -10,96 +10,45 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    Button addBtn;
-    RecyclerView recyclerView;
-    UserAdapter userAdapter; //Объявляем переменные
-    ArrayList<User> userList = new ArrayList<>(); //Объявляем коллекцию
-    @Override
+    FragmentManager fragmentManager = getSupportFragmentManager();
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*for (int i = 0; i < 100; i++) {
-            User user = new User();
-            user.setUserName("Пользователь "+i);
-            user.setUserLastName("Фамилия "+i);
-            userList.add(user); // С помощью циклад добавляем в коллекцию пользователей.
-        }*/
-
-        recyclerView = findViewById(R.id.recyclerView); //Находим RecyclerView
-        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this)); // Установка LayoutManager для отображения списка
-        addBtn = findViewById(R.id.addBtn);
-        addBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, FormUserActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-    private void recyclerViewInit(){
-        Users users = new Users(MainActivity.this);
-        userList = users.getUserList();
-        userAdapter = new UserAdapter(userList); //создание объекта адаптера
-        recyclerView.setAdapter(userAdapter); //установка адаптера
+        Fragment fragment = new UserListFragment();
+        fragmentManager.beginTransaction().add(R.id.fragmentContainer, fragment, "main_fragment").commit();
     }
     @Override
-    public void onResume(){
-        super.onResume();
-        recyclerViewInit();
-    }
-
-
-    private class UserHolder extends RecyclerView.ViewHolder implements View.OnClickListener { // Класс, для создания элементов RecyclerView
-        TextView itemTextView; // Переменная
-        User user;
-        public UserHolder(LayoutInflater inflater, ViewGroup viewGroup) { // Конструктор для холдера
-            super(inflater.inflate(R.layout.single_item, viewGroup, false));
-            itemTextView = itemView.findViewById(R.id.itemTextView); // Инициализация
-            itemView.setOnClickListener(this);
-        }
-        public void bind (String userName, User user) { // Метод для присвоения данных из адаптера
-            this.user = user;
-            itemTextView.setText(userName); // установка значения
-        }
-
-        @Override
-        public void onClick(View view) {
-            Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
-            intent.putExtra("user", user);
-            startActivity(intent);
+    public void onBackPressed(){
+        Fragment currentFragment = fragmentManager.findFragmentByTag("main_fragment");
+        if(currentFragment != null && currentFragment.isVisible()){
+            super.onBackPressed();
+        }else {
+            Fragment fragment = new UserListFragment();
+            fragmentManager.beginTransaction().replace(R.id.fragmentContainer, fragment, "main_fragment").commit();
         }
     }
-
-    private class UserAdapter extends RecyclerView.Adapter<UserHolder> { // класс адаптер, связывает данные и отображает
-        ArrayList<User> users; // Объявляем переменную
-
-        public UserAdapter(ArrayList<User> users) { // конструктор для принимания списка коллекции
-            this.users = users; // Принимаем элементы коллекции
-        }
-
-        @NonNull
-        @Override
-        public UserHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) { //метод создает холдер, для заполнения
-            LayoutInflater inflater = LayoutInflater.from(MainActivity.this); // создаем так называемый раздуватель для холдера
-            return new UserHolder(inflater, parent); // холдер
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull UserHolder userHolder, int position) { // метод, для передачи данных в холдер, для заполнения
-            User user = users.get(position); // Получаем пользователей(позиционка)
-            String userString = user.getUserName()+"\n"+user.getUserLastName();
-            userHolder.bind(userString, user);
-        }
-
-        @Override
-        public int getItemCount() { // Метод для отображения кол-ва элементов в списке
-            return users.size(); // Размер коллекции users
-        }
+    public static void changeFragment(View view, User user) {
+        //Получаем хостинговую активность
+        FragmentActivity activity = (FragmentActivity) view.getContext();
+        //Создаем фрагмент менеджер
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        //Создаем фрагмент
+        Fragment fragment = new UserInfoFragment();
+        // Создаем Bundle (это как коллекция)
+        Bundle bundle = new Bundle();
+        //Записываем пользователя в bundle
+        bundle.putSerializable("user", user);
+        // Добавляем bundle к фрагменту
+        fragment.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.fragmentContainer, fragment).commit();
     }
 }
